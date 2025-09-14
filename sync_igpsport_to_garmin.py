@@ -408,7 +408,7 @@ def collect_activities_to_sync(igpsport_client: IGPSportClient, garmin_client: G
                 continue
             
             # Add to list of activities to sync
-            fit_url = activity.get("fitOssPath")
+            fit_url = activity.get("fitUrl")
             if not fit_url:
                 logger.warning(f"No FIT file URL for activity {activity_id}")
                 continue
