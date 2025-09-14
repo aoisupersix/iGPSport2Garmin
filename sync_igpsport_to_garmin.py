@@ -34,7 +34,7 @@ GARMIN_SESSION_DIR = "garmin_session"  # Dir to store Garmin session data
 class IGPSportClient:
     """Client for the iGPSport API."""
     
-    BASE_URL = "https://prod.zh.igpsport.com/service"
+    BASE_URL = "https://prod.en.igpsport.com/service"
     
     def __init__(self, username: str, password: str):
         self.username = username
