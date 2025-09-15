@@ -24,10 +24,14 @@ load_dotenv()
 
 # Configure logging
 logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s - %(levelname)s - %(message)s"
+    level=logging.DEBUG,
+    format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
 )
 logger = logging.getLogger("igpsport-to-garmin")
+
+# Import our Python-based FIT converter
+from fitconverter import convert_fit, FitConverterError
+logger.info("Using Python-based FIT converter")
 
 # Constants
 LAST_SYNC_FILE = "last_sync_date.json"
@@ -448,6 +452,13 @@ def main():
         logger.error("Missing required environment variables")
         return
 
+    # Import our Go-based FIT converter
+    try:
+        from fitconverter import modify_fit_manufacturer, FitConverterError
+    except ImportError as e:
+        logger.warning(f"Go FIT converter not available: {e}")
+        logger.info("Falling back to Python-based FIT processing")
+
     # Initialize clients
     igpsport_client = IGPSportClient(igpsport_username, igpsport_password)
     garmin_client = GarminClient(garmin_email, garmin_password, garmin_domain)
@@ -489,6 +500,16 @@ def main():
         if not fit_data:
             logger.warning(f"Failed to download FIT file for activity {activity_id}")
             continue
+
+        # Convert FIT file using Go library
+        fit_data = convert_fit(fit_data)
+        logger.debug(f"Successfully converted FIT file using Go converter for activity {activity_id}")
+
+        # Save fit file locally for debugging
+        debug_fit_path = Path(f"debug_activity_{activity_id}.fit")
+        with open(debug_fit_path, "wb") as f:
+            f.write(fit_data)
+        logger.info(f"Saved debug FIT file for activity {activity_id} to {debug_fit_path}")
 
         # Upload to Garmin
         result = garmin_client.upload_fit(fit_data)
