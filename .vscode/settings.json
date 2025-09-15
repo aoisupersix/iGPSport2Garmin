@@ -1,0 +1,10 @@
+{
+  "[python]": {
+    "editor.tabSize": 4,
+    "editor.formatOnSave": true,
+    "editor.formatOnPaste": false,
+    "editor.formatOnType": false,
+    "editor.insertSpaces": true,
+  },
+  "python.envFile": "${workspaceFolder}/.env",
+}

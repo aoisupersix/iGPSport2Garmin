@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Sync iGPSport to Garmin",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/sync_igpsport_to_garmin.py",
+            "console": "integratedTerminal"
+        }
+    ]
+}
