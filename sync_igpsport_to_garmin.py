@@ -505,12 +505,6 @@ def main():
         fit_data = convert_fit(fit_data)
         logger.debug(f"Successfully converted FIT file using Go converter for activity {activity_id}")
 
-        # Save fit file locally for debugging
-        debug_fit_path = Path(f"debug_activity_{activity_id}.fit")
-        with open(debug_fit_path, "wb") as f:
-            f.write(fit_data)
-        logger.info(f"Saved debug FIT file for activity {activity_id} to {debug_fit_path}")
-
         # Upload to Garmin
         result = garmin_client.upload_fit(fit_data)
         if result:
