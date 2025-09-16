@@ -13,12 +13,17 @@ import random
 import datetime
 import requests
 import tempfile
+import sys
 import garth
 from pathlib import Path
 import logging
 from dateutil.parser import parse
 from dotenv import load_dotenv
 from typing import Dict, List, Optional, Tuple, Any
+
+fitfaker_dir = Path(__file__).parent / "FitFaker.NET"
+sys.path.insert(0, str(fitfaker_dir))
+from fit_faker import FitFaker
 
 load_dotenv()
 
@@ -28,10 +33,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(name)s - %(message)s'
 )
 logger = logging.getLogger("igpsport-to-garmin")
-
-# Import our Python-based FIT converter
-from fitconverter import convert_fit, FitConverterError
-logger.info("Using Python-based FIT converter")
 
 # Constants
 LAST_SYNC_FILE = "last_sync_date.json"
@@ -452,13 +453,6 @@ def main():
         logger.error("Missing required environment variables")
         return
 
-    # Import our Go-based FIT converter
-    try:
-        from fitconverter import modify_fit_manufacturer, FitConverterError
-    except ImportError as e:
-        logger.warning(f"Go FIT converter not available: {e}")
-        logger.info("Falling back to Python-based FIT processing")
-
     # Initialize clients
     igpsport_client = IGPSportClient(igpsport_username, igpsport_password)
     garmin_client = GarminClient(garmin_email, garmin_password, garmin_domain)
@@ -501,12 +495,19 @@ def main():
             logger.warning(f"Failed to download FIT file for activity {activity_id}")
             continue
 
-        # Convert FIT file using Go library
-        fit_data = convert_fit(fit_data)
-        logger.debug(f"Successfully converted FIT file using Go converter for activity {activity_id}")
+        # Convert FIT file
+        logger.info(f"Converting FIT file for activity {activity_id} ({len(fit_data)} bytes)")
+        faker = FitFaker()
+        converted_fit_data = faker.fake_from_bytes(fit_data)
+
+        if not converted_fit_data:
+            logger.warning(f"Failed to convert FIT file for activity {activity_id}, skipping upload")
+            continue
+
+        logger.info(f"Successfully converted FIT file for activity {activity_id} ({len(fit_data)} -> {len(converted_fit_data)} bytes)")
 
         # Upload to Garmin
-        result = garmin_client.upload_fit(fit_data)
+        result = garmin_client.upload_fit(converted_fit_data)
         if result:
             logger.info(f"Successfully uploaded activity {activity_id} to Garmin")
             sync_count += 1
