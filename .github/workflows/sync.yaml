@@ -57,6 +57,8 @@ jobs:
 
       - name: Run sync script
         env:
+          IGPSPORT_DOMAIN: ${{ secrets.IGPSPORT_DOMAIN || 'prod.en.igpsport.com' }}
+          IGPSPORT_REFERER: ${{ secrets.IGPSPORT_REFERER || 'https://login.passport.igpsport.com' }}
           IGPSPORT_USERNAME: ${{ secrets.IGPSPORT_USERNAME }}
           IGPSPORT_PASSWORD: ${{ secrets.IGPSPORT_PASSWORD }}
           GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}

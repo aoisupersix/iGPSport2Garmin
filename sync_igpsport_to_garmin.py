@@ -42,24 +42,29 @@ GARMIN_SESSION_DIR = "garmin_session"  # Dir to store Garmin session data
 class IGPSportClient:
     """Client for the iGPSport API."""
 
-    BASE_URL = "https://prod.en.igpsport.com/service"
+    @property
+    def _base_url(self):
+        """Base URL for the iGPSport API."""
+        return f"https://{self.domain}/service"
 
-    def __init__(self, username: str, password: str):
+    def __init__(self, username: str, password: str, domain: str, referer: str):
         self.username = username
         self.password = password
+        self.domain = domain
+        self.referer = referer
         self.token = None
         self.session = requests.Session()
         self.session.headers.update({
             "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
             "accept": "application/json, text/plain, */*",
             "content-type": "application/json",
-            "origin": "https://login.passport.igpsport.com",
-            "referer": "https://login.passport.igpsport.com/"
+            "origin": referer,
+            "referer": referer
         })
 
     def login(self) -> bool:
         """Login to iGPSport."""
-        url = f"{self.BASE_URL}/auth/account/login"
+        url = f"{self._base_url}/auth/account/login"
         data = {
             "username": self.username,
             "password": self.password,
@@ -92,7 +97,7 @@ class IGPSportClient:
             logger.error("Not logged in. Call login() first.")
             return {}
 
-        url = f"{self.BASE_URL}/web-gateway/web-analyze/activity/queryMyActivity"
+        url = f"{self._base_url}/web-gateway/web-analyze/activity/queryMyActivity"
         params = {
             "pageNo": page_no,
             "pageSize": page_size,
@@ -120,7 +125,7 @@ class IGPSportClient:
             logger.error("Not logged in. Call login() first.")
             return {}
 
-        url = f"{self.BASE_URL}/web-gateway/web-analyze/activity/queryActivityDetail/{ride_id}"
+        url = f"{self._base_url}/web-gateway/web-analyze/activity/queryActivityDetail/{ride_id}"
 
         try:
             response = self.session.get(url)
@@ -436,6 +441,8 @@ def collect_activities_to_sync(igpsport_client: IGPSportClient, garmin_client: G
 def main():
     """Main execution function."""
     # Get credentials from environment variables
+    igpsport_domain = os.environ.get("IGPSPORT_DOMAIN") or "prod.en.igpsport.com"
+    igpsport_referer = os.environ.get("IGPSPORT_REFERER") or "https://login.passport.igpsport.com"
     igpsport_username = os.environ.get("IGPSPORT_USERNAME")
     igpsport_password = os.environ.get("IGPSPORT_PASSWORD")
     garmin_email = os.environ.get("GARMIN_EMAIL")
@@ -449,12 +456,12 @@ def main():
     else:
         logger.info("Garmin session directory does not exist yet")
 
-    if not all([igpsport_username, igpsport_password, garmin_email, garmin_password, garmin_domain]):
+    if not all([igpsport_domain, igpsport_referer, igpsport_username, igpsport_password, garmin_email, garmin_password, garmin_domain]):
         logger.error("Missing required environment variables")
         return
 
     # Initialize clients
-    igpsport_client = IGPSportClient(igpsport_username, igpsport_password)
+    igpsport_client = IGPSportClient(igpsport_username, igpsport_password, igpsport_domain, igpsport_referer)
     garmin_client = GarminClient(garmin_email, garmin_password, garmin_domain)
 
     # Authenticate with iGPSport
