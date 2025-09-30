@@ -4,9 +4,12 @@
 
 A Python script that automatically syncs cycling activities from iGPSport to Garmin Connect. This tool downloads FIT files from your iGPSport account and uploads them to Garmin Connect, with intelligent duplicate detection to avoid overlapping activities.
 
+**This project is based on and inspired by [hmqgg/iGPSport2Garmin](https://github.com/hmqgg/iGPSport2Garmin/tree/main).**
+
 ## Features
 
 - 🔄 **Automatic Sync**: Periodically syncs new activities from iGPSport to Garmin Connect
+- 🎯 **Training Status Enhancement**: Converts FIT files to appear as Garmin Edge 530 data, enabling Garmin Connect's advanced training status calculations and performance metrics
 - 🚫 **Duplicate Prevention**: Smart overlap detection prevents duplicate activities
 - 💾 **Session Management**: Maintains authentication sessions to reduce login frequency
 - 🔁 **Retry Mechanism**: Robust error handling with exponential backoff
@@ -41,10 +44,10 @@ In your forked repository:
 |-------------|-------------|---------|
 | `IGPSPORT_USERNAME` | Your iGPSport username/email | `your_username` |
 | `IGPSPORT_PASSWORD` | Your iGPSport password | `your_password` |
-| `IGPSPORT_DOMAIN` | iGPSport domain (optional) | `prod.en.igpsport.com` (or `prod.zh.igpsport.com` for iGPSport China users) |
-| `IGPSPORT_REFERER` | iGPSport referer (optional) | `https://login.passport.igpsport.com` (or `https://login.passport.igpsport.cn` for iGPSport China users) |
 | `GARMIN_EMAIL` | Your Garmin Connect email | `user@example.com` |
 | `GARMIN_PASSWORD` | Your Garmin Connect password | `your_garmin_password` |
+| `IGPSPORT_DOMAIN` | iGPSport domain (optional) | `prod.en.igpsport.com` (or `prod.zh.igpsport.com` for iGPSport China users) |
+| `IGPSPORT_REFERER` | iGPSport referer (optional) | `https://login.passport.igpsport.com` (or `https://login.passport.igpsport.cn` for iGPSport China users) |
 | `GARMIN_DOMAIN` | Garmin domain (optional) | `garmin.com` (or `garmin.cn` for Garmin China users) |
 
 ### Step 3: Enable GitHub Actions
@@ -92,17 +95,15 @@ The script will only sync new activities since the last successful sync, making 
    - Only processes activities newer than the last sync date
    - Checks for time overlap with existing Garmin activities (±5 minutes buffer)
 
-4. **Sync Process**:
+4. **FIT File Conversion**:
+   - Downloads FIT files from iGPSport
+   - Modifies device identification to Garmin Edge 530 (manufacturer: Garmin, product: Edge 530)
+   - Ensures compatibility with Garmin Connect's training status algorithms
+
+5. **Sync Process**:
    - Downloads FIT files from iGPSport
    - Uploads them to Garmin Connect
    - Updates sync tracking data
-
-## Configuration Files
-
-- **`last_sync_date.json`**: Tracks the last successful sync date
-- **`.github/workflows/sync.yaml`**: GitHub Actions workflow configuration
-- **`garmin_session/`**: Directory containing Garmin authentication session data, ignored by Git
-- **`requirements.txt`**: Python dependencies
 
 ## Troubleshooting
 
@@ -131,12 +132,6 @@ The script will only sync new activities since the last successful sync, making 
 - Use environment variables or secrets management
 - The `garmin_session` directory contains sensitive authentication data
 - Consider using app-specific passwords if available
-
-## Dependencies
-
-- **requests**: HTTP client for API calls
-- **garth**: Garmin Connect API client
-- **python-dateutil**: Date/time parsing utilities
 
 ## Disclaimer
 
