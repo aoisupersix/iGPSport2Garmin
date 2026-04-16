@@ -48,7 +48,7 @@ In your forked repository:
 | `GARMIN_PASSWORD` | Your Garmin Connect password | `your_garmin_password` |
 | `IGPSPORT_DOMAIN` | iGPSport domain (optional) | `prod.en.igpsport.com` (or `prod.zh.igpsport.com` for iGPSport China users) |
 | `IGPSPORT_REFERER` | iGPSport referer (optional) | `https://login.passport.igpsport.com` (or `https://login.passport.igpsport.cn` for iGPSport China users) |
-| `GARMIN_DOMAIN` | Garmin domain (optional) | `garmin.com` (or `garmin.cn` for Garmin China users) |
+| `GARMIN_CN` | Garmin CN (optional) | `False` (or `True` for Garmin China users) |
 
 ### Step 3: Enable GitHub Actions
 
