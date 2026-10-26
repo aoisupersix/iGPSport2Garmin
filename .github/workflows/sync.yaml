@@ -64,6 +64,7 @@ jobs:
           GARMIN_EMAIL: ${{ secrets.GARMIN_EMAIL }}
           GARMIN_PASSWORD: ${{ secrets.GARMIN_PASSWORD }}
           GARMIN_DOMAIN: ${{ secrets.GARMIN_DOMAIN || 'garmin.com' }}
+          GARMIN_DEVICE_SERIAL: ${{ secrets.GARMIN_DEVICE_SERIAL }}
         run: python sync_igpsport_to_garmin.py
 
       - name: Commit changes

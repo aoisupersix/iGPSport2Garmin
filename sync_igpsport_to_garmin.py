@@ -405,6 +405,8 @@ def main():
     garmin_email = os.environ.get("GARMIN_EMAIL")
     garmin_password = os.environ.get("GARMIN_PASSWORD")
     garmin_cn = os.environ.get("GARMIN_CN", 'False') == 'True'
+    garmin_device_serial = os.environ.get("GARMIN_DEVICE_SERIAL")
+    garmin_device_serial = int(garmin_device_serial) if garmin_device_serial else None
 
     # Log the session file location for debugging
     logger.info(f"Garmin session directory location: {os.path.abspath(GARMIN_SESSION_DIR)}")
@@ -462,7 +464,7 @@ def main():
         # Convert FIT file
         logger.info(f"Converting FIT file for activity {activity_id} ({len(fit_data)} bytes)")
         faker = FitFaker()
-        converted_fit_data = faker.fake_from_bytes(fit_data)
+        converted_fit_data = faker.fake_from_bytes(fit_data, garmin_device_serial)
 
         if not converted_fit_data:
             logger.warning(f"Failed to convert FIT file for activity {activity_id}, skipping upload")

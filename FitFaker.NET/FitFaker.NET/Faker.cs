@@ -4,7 +4,7 @@ namespace FitFaker.NET;
 
 public static class Faker
 {
-    public static bool Fake(string fitFilePath)
+    public static bool Fake(string fitFilePath, uint? serialNumber = null)
     {
         FileStream? fileStream = null;
         try
@@ -33,6 +33,10 @@ public static class Faker
                 fileId.SetProductName("");
                 fileId.SetProduct(GarminProduct.Edge530Apac);
                 fileId.SetGarminProduct(GarminProduct.Edge530Apac);
+                if (serialNumber is uint serial)
+                {
+                    ReplaceSerialNumber(fileId, FileIdMesg.FieldDefNum.SerialNumber, serial);
+                }
             }
             foreach (var deviceInfo in fitListener.FitMessages.DeviceInfoMesgs)
             {
@@ -41,6 +45,10 @@ public static class Faker
                 deviceInfo.SetProduct(GarminProduct.Edge530Apac);
                 deviceInfo.SetGarminProduct(GarminProduct.Edge530Apac);
                 deviceInfo.SetSoftwareVersion(9.8f);
+                if (serialNumber is uint serial)
+                {
+                    ReplaceSerialNumber(deviceInfo, DeviceInfoMesg.FieldDefNum.SerialNumber, serial);
+                }
             }
 
             fileStream.Position = 0;
@@ -67,6 +75,17 @@ public static class Faker
                 fileStream.Dispose();
             }
         }
+    }
+
+    // iGPSPORT writes serial_number as a 32-byte array, so drop the field to reset it to a single value
+    private static void ReplaceSerialNumber(Mesg mesg, byte fieldNum, uint serial)
+    {
+        var field = mesg.GetField(fieldNum);
+        if (field != null)
+        {
+            mesg.RemoveField(field);
+        }
+        mesg.SetFieldValue(fieldNum, serial);
     }
 
     private static void WriteMesgs(Encode encoder, FitMessages messages)
