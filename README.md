@@ -49,6 +49,7 @@ In your forked repository:
 | `IGPSPORT_DOMAIN` | iGPSport domain (optional) | `prod.en.igpsport.com` (or `prod.zh.igpsport.com` for iGPSport China users) |
 | `IGPSPORT_REFERER` | iGPSport referer (optional) | `https://login.passport.igpsport.com` (or `https://login.passport.igpsport.cn` for iGPSport China users) |
 | `GARMIN_CN` | Garmin CN (optional) | `False` (or `True` for Garmin China users) |
+| `GARMIN_DEVICE_SERIAL` | Serial number of an Edge 530 registered to your Garmin account, other than your primary training device (optional). Needed for activities to count toward Training Status | `1234567890` |
 
 ### Step 3: Enable GitHub Actions
 

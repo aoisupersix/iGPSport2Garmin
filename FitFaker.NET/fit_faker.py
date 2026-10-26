@@ -39,12 +39,13 @@ class FitFaker:
         except Exception as e:
             raise RuntimeError(f"Failed to load FitFaker.NET assembly: {e}")
 
-    def fake_from_bytes(self, fit_data: bytes) -> Optional[bytes]:
+    def fake_from_bytes(self, fit_data: bytes, serial_number: Optional[int] = None) -> Optional[bytes]:
         """
         Modify a FIT file using FitFaker.NET from bytes data.
 
         Args:
             fit_data (bytes): FIT file content as bytes
+            serial_number (Optional[int]): Serial number of a Garmin device registered to the account
 
         Returns:
             Optional[bytes]: Modified FIT file content as bytes, or None if failed
@@ -56,7 +57,7 @@ class FitFaker:
 
         try:
             # Call FitFaker.NET to process the temporary file
-            result = self._faker.Fake(temp_input_path)
+            result = self._faker.Fake(temp_input_path, serial_number)
 
             if result:
                 # Read the modified file back as bytes
